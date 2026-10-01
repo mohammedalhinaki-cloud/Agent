@@ -21,6 +21,7 @@ const labels = {
     remember: 'تذكّر المفتاح في هذا المتصفح',
     rememberHint: 'إذا ألغيت الخيار سيُحفظ مؤقتًا في هذه الجلسة فقط.',
     model: 'النموذج',
+    modelHint: 'إن كان النموذج المختار غير متاح لمفتاحك، سيعيد سَيا المحاولة تلقائيًا مع Gemini Flash (الأحدث). نماذج 2.5 متاحة فقط للمفاتيح التي استخدمتها سابقًا.',
     language: 'لغة الواجهة',
     theme: 'المظهر',
     dark: 'داكن',
@@ -45,6 +46,7 @@ const labels = {
     remember: 'Remember key in this browser',
     rememberHint: 'When disabled, the key is kept only for this browser session.',
     model: 'Model',
+    modelHint: 'If the selected model is unavailable for your key, Saya automatically retries with Gemini Flash (Latest). The 2.5 models only work for keys that already used them.',
     language: 'Interface language',
     theme: 'Theme',
     dark: 'Dark',
@@ -131,6 +133,7 @@ export function SettingsPanel({ settings, apiKey, onSettings, onKey, onClose, on
             <input type="number" min={256} max={8192} step={256} value={settings.maxOutputTokens} onChange={event => onSettings(prev => ({ ...prev, maxOutputTokens: Number(event.target.value) }))} />
           </label>
         </div>
+        <p className="settings-help">{t.modelHint}</p>
 
         <label className="range-label">
           <span>{t.temperature}: <strong>{settings.temperature.toFixed(1)}</strong></span>

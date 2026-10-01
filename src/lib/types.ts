@@ -42,16 +42,31 @@ export const DEFAULT_SYSTEM_PROMPT =
 export const DEFAULT_SETTINGS: Settings = {
   language: 'ar',
   theme: 'dark',
-  model: 'gemini-1.5-flash',
+  model: 'gemini-flash-latest',
   rememberKey: false,
   temperature: 0.7,
   maxOutputTokens: 2048,
   systemPrompt: DEFAULT_SYSTEM_PROMPT,
 };
 
+// `gemini-flash-latest` is a Google-managed alias that always points at the newest
+// stable Flash model, so it keeps working when specific versions are retired.
+export const FALLBACK_MODEL = 'gemini-flash-latest';
+
+// Current Gemini Developer API models (generativelanguage.googleapis.com).
+// Gemini 1.5 / 2.0 models are retired and 404 for every key; 2.5 is limited to
+// keys that already used it, so it stays as a legacy option only.
 export const MODEL_OPTIONS = [
-  { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' },
-  { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro' },
-  { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash' },
-  { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
+  { value: 'gemini-flash-latest', label: 'Gemini Flash (Latest)' },
+  { value: 'gemini-3.8-flash', label: 'Gemini 3.8 Flash' },
+  { value: 'gemini-3.5-flash', label: 'Gemini 3.5 Flash' },
+  { value: 'gemini-3.5-flash-lite', label: 'Gemini 3.5 Flash-Lite' },
+  { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash (Legacy)' },
+  { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro (Legacy)' },
 ];
+
+export const MODEL_IDS = new Set<string>(MODEL_OPTIONS.map(option => option.value));
+
+export function modelLabel(model: string): string {
+  return MODEL_OPTIONS.find(option => option.value === model)?.label ?? model;
+}
