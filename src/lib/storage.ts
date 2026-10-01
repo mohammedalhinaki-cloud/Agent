@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS, type Conversation, type Language, type Settings, type Theme } from './types';
+import { DEFAULT_SETTINGS, MODEL_IDS, type Conversation, type Language, type Settings, type Theme } from './types';
 
 const CHATS_KEY = 'saya:chats';
 const SETTINGS_KEY = 'saya:settings';
@@ -69,7 +69,9 @@ export function loadSettings(): Settings {
     ...raw,
     language: isLanguage(raw.language) ? raw.language : DEFAULT_SETTINGS.language,
     theme: isTheme(raw.theme) ? raw.theme : DEFAULT_SETTINGS.theme,
-    model: typeof raw.model === 'string' && raw.model.trim() ? raw.model : DEFAULT_SETTINGS.model,
+    // Retired models (e.g. gemini-1.5-*) saved by older versions make every request
+    // fail with "model not available", so migrate them to the current default.
+    model: typeof raw.model === 'string' && MODEL_IDS.has(raw.model) ? raw.model : DEFAULT_SETTINGS.model,
     rememberKey: typeof raw.rememberKey === 'boolean' ? raw.rememberKey : DEFAULT_SETTINGS.rememberKey,
     temperature: typeof raw.temperature === 'number' && Number.isFinite(raw.temperature) ? Math.min(2, Math.max(0, raw.temperature)) : DEFAULT_SETTINGS.temperature,
     maxOutputTokens: typeof raw.maxOutputTokens === 'number' && Number.isFinite(raw.maxOutputTokens) ? Math.min(8192, Math.max(256, Math.round(raw.maxOutputTokens))) : DEFAULT_SETTINGS.maxOutputTokens,
