@@ -1,0 +1,22 @@
+name: Check Maaoun AI
+on:
+  pull_request:
+    paths:
+      - "maaoun-ai/**"
+      - ".github/workflows/maaoun-ai-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax and functional tests
+        run: npm run check
+        working-directory: maaoun-ai
