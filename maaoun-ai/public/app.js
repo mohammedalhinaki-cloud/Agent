@@ -66,6 +66,7 @@ function notify(message) {
 function closeSidebar() {
   $("sidebar").classList.remove("open");
   $("overlay").classList.remove("visible");
+  $("overlay").hidden = true;
 }
 function renderChats() {
   const list = $("chatList");
@@ -73,13 +74,16 @@ function renderChats() {
   const filter = $("searchChats").value.trim().toLowerCase();
   for (const chat of [...chats].sort((a, b) => (b.updated || "").localeCompare(a.updated || ""))) {
     if (filter && !(chat.title || "").toLowerCase().includes(filter)) continue;
-    const button = document.createElement("button");
+    const button = document.createElement("div");
+    button.setAttribute("role", "button");
+    button.tabIndex = 0;
     button.className = "chatItem" + (chat.id === activeChatId ? " active" : "");
     const label = document.createElement("span");
     label.className = "chatLabel";
     label.textContent = "◉ " + (chat.title || "محادثة جديدة");
     button.append(label);
     button.onclick = () => { if (!busy) { activeChatId = chat.id; renderAll(); closeSidebar(); } };
+    button.onkeydown = e => { if (e.target === button && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); button.click(); } };
     const del = document.createElement("button");
     del.className = "deleteChat";
     del.textContent = "×";
@@ -444,7 +448,7 @@ function download(filename, text, type) {
 }
 $("newChat").onclick = newChat;
 $("searchChats").oninput = renderChats;
-$("menuBtn").onclick = () => { $("sidebar").classList.add("open"); $("overlay").classList.add("visible"); };
+$("menuBtn").onclick = () => { $("sidebar").classList.add("open"); $("overlay").hidden = false; $("overlay").classList.add("visible"); };
 $("overlay").onclick = closeSidebar;
 for (const id of ["openSettings", "settingsTop"]) $(id).onclick = () => $("settingsDialog").showModal();
 $("closeSettings").onclick = () => $("settingsDialog").close();
