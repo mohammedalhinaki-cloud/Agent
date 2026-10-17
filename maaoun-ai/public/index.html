@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="معون AI — مساعد ذكي واحد لمزوّدين متعددين ومفاتيح API متعددة.">
+  <title>معون AI | مساعدك الذكي</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script defer src="./app.js"></script>
+</head>
+<body>
+<div id="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><span class="brandMark">م</span><span><strong>معون <em>AI</em></strong><small>مساحتك للذكاء الاصطناعي</small></span></div>
+    <button id="newChat" class="primary wide">＋ محادثة جديدة</button>
+    <label class="sidebarCaption" for="searchChats">المحادثات</label>
+    <input id="searchChats" class="search" placeholder="بحث في المحادثات..." autocomplete="off">
+    <div id="chatList" class="chatList"></div>
+    <div class="sideFoot">
+      <button id="exportChats" class="sideButton">⇩ تصدير المحادثات</button>
+      <button id="openSettings" class="sideButton">⚙ المفاتيح والإعدادات</button>
+      <div class="smallTip">تُحفظ محادثاتك على هذا الجهاز فقط.</div>
+    </div>
+  </aside>
+  <div id="overlay" class="overlay" hidden></div>
+  <main class="main">
+    <header class="topbar">
+      <button class="iconButton mobileOnly" id="menuBtn" aria-label="فتح القائمة">☰</button>
+      <div class="topTitle"><strong>معون AI</strong><small>استخدم مفتاحك، واختر نموذجك</small></div>
+      <div class="selectors">
+        <label class="fieldTop"><span>مفتاح API</span><select id="keySelect"><option value="">أضف مفتاحًا أولًا</option></select></label>
+        <label class="fieldTop"><span>النموذج</span><select id="modelSelect"></select></label>
+        <button class="iconButton" id="refreshModels" title="تحديث قائمة النماذج" aria-label="تحديث النماذج">↻</button>
+        <button class="iconButton" id="settingsTop" title="إدارة المفاتيح" aria-label="إدارة المفاتيح">⚙</button>
+      </div>
+    </header>
+    <div id="notice" class="notice" role="status" hidden></div>
+    <section class="conversation" id="conversation" aria-live="polite">
+      <div id="welcome" class="welcome">
+        <div class="welcomeLogo">م</div>
+        <h1>كيف أستطيع مساعدتك؟</h1>
+        <p>نموذجك ومفتاحك في مكان واحد. اكتب أو ارفع ملفًا وابدأ.</p>
+        <div class="quickActions">
+          <button data-prompt="اكتب لي رسالة احترافية عن: ">✍ كتابة</button>
+          <button data-prompt="اشرح لي هذا الموضوع ببساطة مع أمثلة: ">◈ شرح</button>
+          <button data-prompt="ساعدني في كتابة كود برمجي يحقق: ">⌘ برمجة</button>
+          <button data-prompt="ترجم النص التالي إلى الإنجليزية بأسلوب طبيعي: ">↗ ترجمة</button>
+        </div>
+      </div>
+      <div id="messages" class="messages"></div>
+    </section>
+    <div class="composerWrap">
+      <div id="attachments" class="attachments" hidden></div>
+      <form id="chatForm" class="composer">
+        <textarea id="prompt" rows="1" aria-label="الرسالة" placeholder="اسأل عن أي شيء... (Enter للإرسال)" maxlength="30000"></textarea>
+        <div class="composerBottom">
+          <div class="leftTools">
+            <label class="iconButton attachButton" title="إرفاق صورة أو ملف نصي" aria-label="إرفاق ملف">＋<input id="fileInput" type="file" accept=".txt,.md,.csv,.json,.js,.ts,.tsx,.jsx,.py,.html,.css,.sql,.xml,.yaml,.yml,.log,image/png,image/jpeg,image/webp" hidden multiple></label>
+            <button type="button" class="iconButton" id="micBtn" title="إملاء صوتي (إذا كان المتصفح يدعم ذلك)" aria-label="إملاء صوتي">♩</button>
+            <span class="status" id="status">جاهز</span>
+          </div>
+          <button class="sendButton" id="sendBtn" type="submit" aria-label="إرسال">➤</button>
+          <button class="stopButton" id="stopBtn" type="button" hidden>إيقاف ■</button>
+        </div>
+      </form>
+      <div class="footNote">الردود قد تحتوي على أخطاء · الاستهلاك وفق تسعيرة مزوّد API الخاص بك</div>
+    </div>
+  </main>
+</div>
+<dialog id="settingsDialog" class="dialog">
+  <div class="dialogHeader"><div><strong>المفاتيح والإعدادات</strong><small>أضف مفاتيح كثيرة وبدّل بينها مباشرة</small></div><button class="iconButton" id="closeSettings" aria-label="إغلاق">✕</button></div>
+  <form id="keyForm" class="settingsForm">
+    <label>مزوّد الخدمة<select id="providerInput" required>
+      <option value="gemini">Google Gemini</option>
+      <option value="openai">OpenAI</option>
+      <option value="groq">Groq</option>
+      <option value="deepseek">DeepSeek</option>
+      <option value="anthropic">Anthropic Claude</option>
+      <option value="openrouter">OpenRouter</option>
+    </select></label>
+    <label>اسم المفتاح<input id="keyName" placeholder="مثال: Gemini - حسابي الأول" maxlength="45"></label>
+    <label>مفتاح API<input id="keyValue" type="password" required autocomplete="off" placeholder="ألصق المفتاح هنا"></label>
+    <label class="rememberRow"><input type="checkbox" id="rememberKey"> الاحتفاظ بالمفتاح على هذا المتصفح بعد إغلاقه</label>
+    <p class="securityTip">افتراضيًا يُحفظ المفتاح للجلسة فقط، ويُرسل إلى مزوّد الخدمة عبر خادم معون دون تخزينه عليه. لا تحفظ المفاتيح على جهاز مشترك.</p>
+    <button class="primary" type="submit">＋ إضافة المفتاح</button>
+  </form>
+  <div class="separator"></div>
+  <div class="settingsLabel">مفاتيحك <small id="keysCount"></small></div>
+  <div id="keysList" class="keysList"></div>
+  <div class="separator"></div>
+  <label class="settingsLabel" for="customModel">نموذج مخصص (اختياري)</label>
+  <input id="customModel" class="inputFull" placeholder="مثال: gemini-2.5-flash">
+  <small class="helper">اضغط تطبيق لتفعيل النموذج المكتوب، أو اختر من قائمة النماذج في الأعلى.</small>
+  <button class="secondary" id="applyModel" type="button">تطبيق النموذج</button>
+  <label class="settingsLabel" for="systemPrompt">تعليمات المساعد (اختياري)</label>
+  <textarea id="systemPrompt" rows="3" placeholder="مثال: أجب بالعربية وباختصار"></textarea>
+  <button class="secondary" id="saveInstructions" type="button">حفظ التعليمات</button>
+  <button class="dangerText" id="clearHistory" type="button">حذف جميع المحادثات من هذا الجهاز</button>
+</dialog>
+</body>
+</html>
